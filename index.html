@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APEX CITY 3D - GTA Open World Experience</title>
+  <link rel="stylesheet" href="./style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- 3D Canvas Container -->
+  <div id="game-container"></div>
+
+  <!-- Fullscreen Interactive GPS World Map Modal -->
+  <div id="map-modal" class="map-modal hidden">
+    <div class="map-modal-card">
+      <div class="map-header">
+        <div class="map-title">🗺️ APEX OPEN WORLD GPS MAP</div>
+        <div class="map-teleport-buttons">
+          <button id="btn-tp-airport" class="hud-btn tp-btn" title="Fast Travel to Airport">✈️ AIRPORT</button>
+          <button id="btn-tp-downtown" class="hud-btn tp-btn" title="Fast Travel to Downtown">🏙️ DOWNTOWN</button>
+          <button id="btn-tp-mall" class="hud-btn tp-btn" title="Fast Travel to Mall">🛍️ MALL</button>
+        </div>
+        <div class="map-actions">
+          <button id="btn-zoom-in" class="hud-btn zoom-btn" title="Zoom In">🔍 +</button>
+          <button id="btn-zoom-out" class="hud-btn zoom-btn" title="Zoom Out">🔍 −</button>
+          <button id="btn-close-map" class="hud-btn map-close-btn">CLOSE [ESC / M]</button>
+        </div>
+      </div>
+      <div class="map-canvas-wrapper">
+        <canvas id="fullscreen-map-canvas" width="860" height="560"></canvas>
+      </div>
+      <div class="map-legend">
+        <span><b style="color:#00f0ff;">▲</b> Your Location</span>
+        <span><b style="color:#00ff88;">●</b> Vehicle Location</span>
+        <span><b style="color:#ffaa00;">■</b> Downtown Metropolis</span>
+        <span><b style="color:#00f0ff;">■</b> Airport Runway</span>
+        <span><b style="color:#ff0055;">■</b> Grand Shopping Mall</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- GTA Proximity Interaction Prompt (Center Screen) -->
+  <div id="interact-prompt" class="interact-prompt">[F] ENTER VEHICLE</div>
+
+  <!-- =========================================================================
+       MAIN GAMEPLAY HUD
+       ========================================================================= -->
+  <div id="hud">
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <div class="top-left">
+        <div class="game-logo">APEX<span>3D</span></div>
+        <div class="auth-pill"><span class="auth-dot"></span> ADMIN AUTHORIZED</div>
+        <div id="district-badge" class="district-badge">🏙️ DOWNTOWN METROPOLIS</div>
+        <div id="player-mode-badge" class="mode-badge">🚗 IN CAR</div>
+        <div id="fps-counter" class="fps-badge">60 FPS</div>
+      </div>
+
+      <!-- Quick Toolbar -->
+      <div class="toolbar">
+        <button id="btn-open-map" class="hud-btn highlight-btn" title="Open Fullscreen GPS Map [M]">🗺️ MAP [M]</button>
+
+        <div class="toolbar-group">
+          <label>TIME</label>
+          <select id="time-select" class="hud-select">
+            <option value="sunset" selected>Golden Hour</option>
+            <option value="noon">High Noon</option>
+            <option value="night">Cyber Night</option>
+          </select>
+        </div>
+
+        <div class="toolbar-group">
+          <label>GFX</label>
+          <select id="gfx-select" class="hud-select">
+            <option value="high" selected>Smooth 60FPS</option>
+            <option value="ultra">Ultra 4K</option>
+            <option value="medium">Max Performance</option>
+          </select>
+        </div>
+
+        <button id="btn-camera" class="hud-btn" title="Cycle Camera [C]">Cam [C]</button>
+        <button id="btn-lights" class="hud-btn" title="Toggle Headlights [L]">Beam [L]</button>
+        <button id="btn-audio" class="hud-btn" title="Mute/Unmute">🔊</button>
+        <button id="btn-reset" class="hud-btn reset-btn" title="Reset Car [R]">Respawn [R]</button>
+      </div>
+    </header>
+
+    <!-- Vehicle Switcher (Top Right Bar) -->
+    <div class="vehicle-switcher">
+      <div class="switcher-title">SELECT VEHICLE</div>
+      <div class="vehicle-buttons">
+        <button class="car-btn active" data-car="supercar">
+          <span class="car-num">1</span>
+          <span class="car-name">EXOTIC GT</span>
+        </button>
+        <button class="car-btn" data-car="muscle">
+          <span class="car-num">2</span>
+          <span class="car-name">V8 MUSCLE</span>
+        </button>
+        <button class="car-btn" data-car="sedan">
+          <span class="car-num">3</span>
+          <span class="car-name">LUXURY SEDAN</span>
+        </button>
+        <button class="car-btn" data-car="suv">
+          <span class="car-num">4</span>
+          <span class="car-name">CYBER SUV</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- On-Screen Dual Controls (Works with Mouse Click & Keyboard) -->
+    <div class="touch-controls">
+      <div class="touch-dpad">
+        <button class="hud-key dpad-btn" data-key="W" title="Hold or Press W">▲ DRIVE [W]</button>
+        <div class="dpad-horizontal">
+          <button class="hud-key dpad-btn" data-key="A" title="Hold or Press A">◀ LEFT [A]</button>
+          <button class="hud-key dpad-btn" data-key="S" title="Hold or Press S">▼ REVERSE [S]</button>
+          <button class="hud-key dpad-btn" data-key="D" title="Hold or Press D">▶ RIGHT [D]</button>
+        </div>
+      </div>
+      <div class="touch-actions">
+        <button class="hud-key action-btn" data-key="F" title="Press F">🚪 EXIT / ENTER CAR [F]</button>
+        <button class="hud-key action-btn" data-key="SPACE" title="Press SPACE">🏎️ DRIFT / JUMP [SPACE]</button>
+      </div>
+    </div>
+
+    <!-- Drift Notification Banner -->
+    <div id="drift-banner" class="drift-banner">
+      <div class="drift-text">DRIFT!</div>
+      <div id="drift-points" class="drift-points">+250 PTS</div>
+    </div>
+
+    <!-- Bottom Left: Minimap Radar (Click to Open Fullscreen Map) -->
+    <div class="minimap-container" title="Click to open Fullscreen GPS Map [M]">
+      <canvas id="minimap-canvas" width="180" height="180"></canvas>
+      <div class="minimap-label">CLICK FOR MAP [M]</div>
+      <div class="minimap-compass" id="minimap-compass">N</div>
+    </div>
+
+    <!-- Bottom Right: Dashboard & Speedometer -->
+    <div class="dashboard" id="dashboard-hud">
+      <div class="gauge-card">
+        <div class="gear-display">
+          <span class="gear-sub">GEAR</span>
+          <span id="gear-val" class="gear-num">1</span>
+        </div>
+
+        <div class="speedo-center">
+          <div class="speed-num" id="speed-val">0</div>
+          <div class="speed-unit">KM / H</div>
+        </div>
+
+        <div class="rpm-meter">
+          <div class="rpm-bar-container">
+            <div id="rpm-bar" class="rpm-bar"></div>
+          </div>
+          <div class="rpm-labels">
+            <span>0</span>
+            <span>2</span>
+            <span>4</span>
+            <span>6</span>
+            <span>8</span>
+            <span class="redline">MAX RPM</span>
+          </div>
+        </div>
+
+        <div class="dash-indicators">
+          <span id="ind-drift" class="ind-pill">DRIFT</span>
+          <span id="ind-light" class="ind-pill active">BEAM</span>
+          <span id="ind-tcs" class="ind-pill active">TCS</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls Bar at Bottom -->
+    <div class="bottom-hints">
+      <span>[W/S] Drive & Reverse</span>
+      <span>[A/D] Steer</span>
+      <span>[F] Exit/Enter Car</span>
+      <span>[SPACE] Drift / Jump</span>
+      <span>[M] Fullscreen GPS Map</span>
+      <span>[1-4] Switch Car</span>
+    </div>
+  </div>
+
+  <!-- Main Game Script -->
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

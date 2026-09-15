@@ -1,0 +1,979 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #05070c;
+  font-family: 'Rajdhani', sans-serif;
+  color: #ffffff;
+}
+
+#game-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+/* =========================================================================
+   ADMIN AUTHENTICATION PORTAL
+   ========================================================================= */
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(12, 18, 32, 0.95), rgba(4, 7, 14, 0.99));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+  backdrop-filter: blur(10px);
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.auth-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.auth-card {
+  background: rgba(15, 23, 40, 0.9);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 50px rgba(0, 240, 255, 0.2), inset 0 0 25px rgba(0, 240, 255, 0.05);
+  border-radius: 14px;
+  padding: 35px 45px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+}
+
+.security-badge {
+  display: inline-block;
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #ffaa00;
+  background: rgba(255, 170, 0, 0.12);
+  border: 1px solid rgba(255, 170, 0, 0.4);
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+}
+
+.auth-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.auth-title span {
+  color: #00f0ff;
+}
+
+.auth-desc {
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  color: #8da4be;
+  margin-bottom: 24px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  margin-bottom: 14px;
+}
+
+.input-group label {
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: #00f0ff;
+  margin-bottom: 6px;
+}
+
+.input-group input {
+  background: #0d1524;
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.input-group input:focus {
+  border-color: #00f0ff;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+  background: #131e33;
+}
+
+.auth-error {
+  color: #ff4757;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 14px;
+  min-height: 18px;
+}
+
+.auth-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #00f0ff;
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(0, 240, 255, 0.15);
+  border-color: #00f0ff;
+}
+
+.btn-primary {
+  font-family: 'Orbitron', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #00f0ff, #0077ff);
+  color: #050a14;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 35px rgba(0, 240, 255, 0.7);
+  filter: brightness(1.1);
+}
+
+.auth-creds-hint {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 18px;
+  font-size: 12px;
+  color: #6882a0;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.auth-creds-hint code {
+  color: #00f0ff;
+  font-weight: 700;
+}
+
+/* =========================================================================
+   Start Overlay (Translucent)
+   ========================================================================= */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 10, 20, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  backdrop-filter: blur(3px);
+  cursor: pointer;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.overlay-card {
+  background: rgba(14, 20, 35, 0.85);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  box-shadow: 0 0 50px rgba(0, 240, 255, 0.2);
+  border-radius: 14px;
+  padding: 35px 45px;
+  max-width: 650px;
+  text-align: center;
+}
+
+.brand-badge {
+  display: inline-block;
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #00f0ff;
+  background: rgba(0, 240, 255, 0.12);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+}
+
+.game-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 40px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+  margin-bottom: 6px;
+  color: #fff;
+}
+
+.subtitle {
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: #8da4be;
+  margin-bottom: 24px;
+}
+
+.controls-preview {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 24px;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 14px 20px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.control-col {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.key-badge {
+  background: #1a2538;
+  color: #00f0ff;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 5px;
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  min-width: 55px;
+  text-align: center;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #cfddec;
+}
+
+.perf-note {
+  margin-top: 12px;
+  font-size: 11px;
+  color: #6c88a8;
+}
+
+/* =========================================================================
+   GTA Interacting Prompt
+   ========================================================================= */
+.interact-prompt {
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(10, 18, 32, 0.88);
+  border: 2px solid #00f0ff;
+  color: #00f0ff;
+  font-family: 'Orbitron', monospace;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  padding: 10px 22px;
+  border-radius: 30px;
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.5);
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  animation: promptPulse 1.2s infinite alternate;
+}
+
+.interact-prompt.visible {
+  opacity: 1;
+}
+
+@keyframes promptPulse {
+  0% { transform: translate(-50%, -50%) scale(0.96); box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); }
+  100% { transform: translate(-50%, -50%) scale(1.04); box-shadow: 0 0 30px rgba(0, 240, 255, 0.8); }
+}
+
+/* =========================================================================
+   Main Gameplay HUD
+   ========================================================================= */
+#hud {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Top Bar */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 22px;
+  background: linear-gradient(180deg, rgba(5, 10, 20, 0.9) 0%, rgba(5, 10, 20, 0) 100%);
+  pointer-events: auto;
+}
+
+.top-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.game-logo {
+  font-family: 'Orbitron', monospace;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.game-logo span {
+  color: #00f0ff;
+}
+
+.district-badge {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  background: rgba(0, 240, 255, 0.15);
+  color: #00f0ff;
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.mode-badge {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(0, 255, 150, 0.15);
+  color: #00ff96;
+  border: 1px solid rgba(0, 255, 150, 0.4);
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.fps-badge {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  color: #8da4be;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(10, 18, 32, 0.7);
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.toolbar-group label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #8da4be;
+}
+
+.hud-select, .hud-btn {
+  background: #142036;
+  color: #fff;
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.hud-select:hover, .hud-btn:hover {
+  border-color: #00f0ff;
+  background: #1c2e4f;
+}
+
+.reset-btn {
+  background: rgba(255, 60, 60, 0.2);
+  border: 1px solid rgba(255, 60, 60, 0.5);
+  color: #ff6060;
+}
+
+.logout-btn {
+  background: rgba(255, 170, 0, 0.15);
+  border: 1px solid rgba(255, 170, 0, 0.4);
+  color: #ffaa00;
+}
+
+/* =========================================================================
+   Vehicle Switcher
+   ========================================================================= */
+.vehicle-switcher {
+  position: absolute;
+  top: 70px;
+  right: 22px;
+  background: rgba(10, 18, 30, 0.85);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  border-radius: 8px;
+  padding: 8px 12px;
+  backdrop-filter: blur(8px);
+  pointer-events: auto;
+}
+
+.switcher-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: #00f0ff;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.vehicle-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.car-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 5px 10px;
+  border-radius: 5px;
+  color: #c0d0e4;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 130px;
+}
+
+.car-btn:hover {
+  background: rgba(0, 240, 255, 0.15);
+  border-color: rgba(0, 240, 255, 0.5);
+  color: #fff;
+}
+
+.car-btn.active {
+  background: linear-gradient(90deg, rgba(0, 240, 255, 0.3), rgba(0, 119, 255, 0.3));
+  border-color: #00f0ff;
+  color: #fff;
+}
+
+.car-num {
+  background: #1c2a42;
+  color: #00f0ff;
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+}
+
+/* =========================================================================
+   Live On-Screen Dual Controls (Keyboard & Mouse Clickable)
+   ========================================================================= */
+.touch-controls {
+  position: absolute;
+  top: 75px;
+  left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(10, 18, 32, 0.85);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  border-radius: 12px;
+  padding: 10px 14px;
+  backdrop-filter: blur(8px);
+  pointer-events: auto;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.6);
+}
+
+.touch-dpad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.dpad-horizontal {
+  display: flex;
+  gap: 6px;
+}
+
+.touch-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.hud-key {
+  background: #141f33;
+  color: #cfddec;
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  user-select: none;
+}
+
+.hud-key:hover {
+  background: #1d2e4d;
+  border-color: #00f0ff;
+  color: #fff;
+}
+
+.hud-key.pressed, .hud-key:active {
+  background: #00f0ff;
+  color: #050a14;
+  border-color: #fff;
+  box-shadow: 0 0 16px #00f0ff;
+  transform: scale(0.96);
+}
+
+.auth-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 255, 150, 0.12);
+  color: #00ff96;
+  border: 1px solid rgba(0, 255, 150, 0.3);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.auth-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #00ff96;
+  box-shadow: 0 0 8px #00ff96;
+}
+
+.highlight-btn {
+  background: rgba(0, 240, 255, 0.2);
+  border-color: #00f0ff;
+  color: #00f0ff;
+  font-weight: 700;
+}
+
+/* =========================================================================
+   Minimap Radar
+   ========================================================================= */
+.minimap-container {
+  position: absolute;
+  bottom: 22px;
+  left: 22px;
+  width: 170px;
+  height: 170px;
+  background: rgba(6, 12, 22, 0.85);
+  border: 2px solid rgba(0, 240, 255, 0.4);
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+  pointer-events: auto;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.minimap-container:hover {
+  transform: scale(1.06);
+  border-color: #00f0ff;
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.6);
+}
+
+/* =========================================================================
+   Fullscreen GPS World Map Modal
+   ========================================================================= */
+.map-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 7, 14, 0.92);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 150;
+  backdrop-filter: blur(8px);
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.map-modal.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.map-modal-card {
+  background: rgba(12, 18, 30, 0.95);
+  border: 2px solid rgba(0, 240, 255, 0.5);
+  box-shadow: 0 0 50px rgba(0, 240, 255, 0.3), inset 0 0 30px rgba(0, 240, 255, 0.05);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 920px;
+  width: 95%;
+}
+
+.map-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.map-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #00f0ff;
+}
+
+.map-teleport-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.tp-btn {
+  background: rgba(0, 240, 255, 0.15);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  color: #00f0ff;
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tp-btn:hover {
+  background: #00f0ff;
+  color: #050a14;
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.6);
+}
+
+.map-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.zoom-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  padding: 4px 10px;
+}
+
+.map-close-btn {
+  background: rgba(255, 60, 60, 0.2);
+  border-color: #ff4757;
+  color: #ff4757;
+  font-weight: 700;
+}
+
+.map-close-btn:hover {
+  background: rgba(255, 60, 60, 0.4);
+}
+
+.map-canvas-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background: #050912;
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+#fullscreen-map-canvas {
+  width: 100%;
+  max-height: 60vh;
+  object-fit: contain;
+}
+
+.map-legend {
+  display: flex;
+  justify-content: space-around;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #8da4be;
+}
+
+#minimap-canvas {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.minimap-label {
+  position: absolute;
+  top: 8px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  color: rgba(0, 240, 255, 0.7);
+  pointer-events: none;
+}
+
+.minimap-compass {
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: #ff3366;
+  pointer-events: none;
+}
+
+/* =========================================================================
+   Dashboard & Speedometer
+   ========================================================================= */
+.dashboard {
+  position: absolute;
+  bottom: 22px;
+  right: 22px;
+  pointer-events: auto;
+}
+
+.gauge-card {
+  background: radial-gradient(circle at center, rgba(12, 20, 36, 0.9), rgba(5, 9, 18, 0.95));
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.8);
+  border-radius: 14px;
+  padding: 14px 20px;
+  width: 230px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.gear-display {
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.gear-sub {
+  font-size: 8px;
+  font-family: 'Orbitron', monospace;
+  color: #7b93af;
+}
+
+.gear-num {
+  font-family: 'Orbitron', monospace;
+  font-size: 24px;
+  font-weight: 900;
+  color: #00f0ff;
+  line-height: 1;
+}
+
+.speedo-center {
+  text-align: center;
+  margin-top: 2px;
+}
+
+.speed-num {
+  font-family: 'Orbitron', monospace;
+  font-size: 48px;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.speed-unit {
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #00f0ff;
+}
+
+.rpm-meter {
+  width: 100%;
+}
+
+.rpm-bar-container {
+  width: 100%;
+  height: 7px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.rpm-bar {
+  width: 10%;
+  height: 100%;
+  background: linear-gradient(90deg, #00f0ff 0%, #00ff88 65%, #ff3344 100%);
+  border-radius: 4px;
+  transition: width 0.08s ease-out;
+}
+
+.rpm-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  color: #6882a0;
+  margin-top: 3px;
+}
+
+.rpm-labels .redline {
+  color: #ff3344;
+}
+
+.dash-indicators {
+  display: flex;
+  gap: 8px;
+}
+
+.ind-pill {
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #4b617c;
+}
+
+.ind-pill.active {
+  background: rgba(0, 240, 255, 0.15);
+  color: #00f0ff;
+}
+
+#ind-drift.active {
+  background: rgba(255, 170, 0, 0.2);
+  color: #ffaa00;
+}
+
+/* Drift Banner */
+.drift-banner {
+  position: absolute;
+  top: 130px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.8);
+  opacity: 0;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+
+.drift-banner.show {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
+.drift-text {
+  font-family: 'Orbitron', monospace;
+  font-size: 26px;
+  font-weight: 900;
+  color: #ffaa00;
+  font-style: italic;
+  text-shadow: 0 0 15px #ffaa00;
+}
+
+.drift-points {
+  font-family: 'Orbitron', monospace;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* Bottom Controls */
+.bottom-hints {
+  align-self: center;
+  margin-bottom: 10px;
+  background: rgba(5, 10, 20, 0.75);
+  padding: 5px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #92a9c3;
+  backdrop-filter: blur(4px);
+}
