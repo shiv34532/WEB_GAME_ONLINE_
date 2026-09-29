@@ -95,6 +95,8 @@ A high-performance 3D Open World online PC game running in the browser with real
 npm run build
 ```
 Build files will be generated into the `dist/` directory.
+This manly dedicated for Online Web Game Anthuthieste.
+
 
 ---
 
